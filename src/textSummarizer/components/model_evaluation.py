@@ -29,8 +29,8 @@ class ModelEvaluation:
     
     def calculate_metric_on_test_ds(self,dataset, metric, model, tokenizer, 
                                batch_size=16, device="cuda" if torch.cuda.is_available() else "cpu", 
-                               column_text="article", 
-                               column_summary="highlights"):
+                               column_text="dialogue", 
+                               column_summary="summary"):
         article_batches = list(self.generate_batch_sized_chunks(dataset[column_text], batch_size))
         target_batches = list(self.generate_batch_sized_chunks(dataset[column_summary], batch_size))
 

@@ -24,9 +24,3 @@ class PredictionPipeline:
         print(output)
 
         return output
-
-    
-
-
-
-    

@@ -122,7 +122,7 @@ Email: karim_ossama94@hotmail.com
 
     AWS_SECRET_ACCESS_KEY=
 
-    AWS_REGION = us-east-2
+    AWS_REGION = ca-central-1
 
     AWS_ECR_LOGIN_URI = demo>>  
 

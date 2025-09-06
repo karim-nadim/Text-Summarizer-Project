@@ -4,12 +4,10 @@
 
 1. Update config.yaml
 2. Update params.yaml
-3. Update entity
-4. Update the configuration manager in src config
-5. update the conponents
-6. update the pipeline
-7. update the main.py
-8. update the app.py
+3. update the conponents
+4. update the pipeline
+5. update the main.py
+6. update the app.py
 
 
 # How to run?
@@ -18,7 +16,7 @@
 Clone the repository
 
 ```bash
-https://github.com/entbappy/End-to-end-Text-Summarization
+https://github.com/karim-nadim/Text-Summarizer-Project.git
 ```
 ### STEP 01- Create a conda environment after opening the repository
 
@@ -49,9 +47,9 @@ open up you local host and port
 
 
 ```bash
-Author: Krish Naik
+Author: Karim Nadim
 Data Scientist
-Email: krishnaik06@gmail.com
+Email: karim_ossama94@hotmail.com
 
 ```
 
@@ -90,7 +88,7 @@ Email: krishnaik06@gmail.com
 
 	
 ## 3. Create ECR repo to store/save docker image
-    - Save the URI: 115283375425.dkr.ecr.us-east-2.amazonaws.com/textsummarization
+    - Save the URI: ......../textsummarization
 
 	
 ## 4. Create EC2 machine (Ubuntu) 
@@ -126,6 +124,6 @@ Email: krishnaik06@gmail.com
 
     AWS_REGION = us-east-2
 
-    AWS_ECR_LOGIN_URI = demo>>  115283375425.dkr.ecr.us-east-2.amazonaws.com
+    AWS_ECR_LOGIN_URI = demo>>  
 
     ECR_REPOSITORY_NAME = textsummarization

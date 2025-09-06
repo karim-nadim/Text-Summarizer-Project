@@ -37,14 +37,16 @@ class ModelTrainer:
             warmup_steps=params.warmup_steps, 
             per_device_train_batch_size=params.per_device_train_batch_size, 
             per_device_eval_batch_size=params.per_device_train_batch_size,
-            weight_decay=params.weight_decay, logging_steps=params.logging_steps,
+            weight_decay=params.weight_decay, 
             eval_strategy=params.evaluation_strategy, eval_steps=params.eval_steps, 
             save_steps=params.save_steps, 
             gradient_accumulation_steps=params.gradient_accumulation_steps,
 
+            logging_steps=params.logging_steps,
             logging_dir=os.path.join(self.config.model_trainer.root_dir, "logs"),
             logging_first_step=True,
             log_level="info",
+            disable_tqdm=True, #disables progress bar printing
             report_to=[] 
         ) 
 

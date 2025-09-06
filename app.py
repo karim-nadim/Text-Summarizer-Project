@@ -5,6 +5,7 @@ import os
 from fastapi.templating import Jinja2Templates
 from starlette.responses import RedirectResponse
 from fastapi.responses import Response
+import subprocess
 from src.textSummarizer.pipeline.prediction import PredictionPipeline
 
 
@@ -21,11 +22,22 @@ async def index():
 @app.get("/train")
 async def training():
     try:
-        os.system("python main.py")
-        return Response("Training successful !!")
+        # Run training and capture output
+        result = subprocess.run(
+            ["python3", "main.py"],
+            capture_output=True,  # captures stdout/stderr
+            text=True             # returns strings instead of bytes
+        )
+
+        # Check if training succeeded
+        if result.returncode == 0:
+            return Response("Training completed successfully !!")
+        else:
+            # Return stderr if there was an error
+            return Response(f"Training failed!\nError:\n{result.stderr}")
 
     except Exception as e:
-        return Response(f"Error Occurred! {e}")
+        return Response(f"Unexpected error occurred: {e}")
     
 
 

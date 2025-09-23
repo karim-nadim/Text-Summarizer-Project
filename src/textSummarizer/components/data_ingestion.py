@@ -21,12 +21,15 @@ class DataIngestion:
         create_directories([self.config.data_ingestion.root_dir])
 
     def import_data(self):
-        dataset = load_dataset("nyamuda/samsum")
-        dataset.save_to_disk(f"{self.config.data_ingestion.root_dir}/samsum_dataset")
-        #ds["train"].to_csv(f"{self.config.root_dir}/samsum_dataset/samsum-train.csv")
-        #ds["validation"].to_csv(f"{self.config.root_dir}/samsum_dataset/samsum-validation.csv")
-        #ds["test"].to_csv(f"{self.config.root_dir}/samsum_dataset/samsum-test.csv")
-        logger.info("Train, Test, and Valiadation Datasets have been imported from Hugging Face")
+        save_path = f"{self.config.data_ingestion.root_dir}/samsum_dataset"
+        
+        if not os.path.exists(save_path):
+            dataset = load_dataset("nyamuda/samsum")
+            dataset.save_to_disk(save_path)
+            logger.info("Train, Test, and Validation Datasets have been imported from Hugging Face")
+        else:
+            logger.info("Dataset already exists, skipping save_to_disk")
+
         
 
     

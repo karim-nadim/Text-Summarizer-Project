@@ -53,6 +53,34 @@ Email: karim_ossama94@hotmail.com
 
 ```
 
+<br><br>
+
+## DVC 
+
+ - It is used to manage the pipeline (what if we want to run the pipeline from the model_training step, and skip all the steps that were before) 
+ - Its very lite weight for POC only
+ - lite weight expriements tracker
+ - It can perform Orchestration (Creating Pipelines)
+ - Inside dvc.yaml we define each stage (e.g. data_ingestion), its python files, its dependancies, and its outputs.
+<br><br>
+
+ 
+After completing all pipleline files, initialize DVC by running:
+```bash
+dvc init
+```
+Then run the full pipeline (ensure there is no artifacts folder). This work similar to main.py. Run:
+```bash
+dvc repro
+```
+A dvc.lock will be created automatically saving all info about the pipeline and tracking the last changes. If "dvc repro" is run again, only the pipeline stages with any new changes will run.
+```bash
+dvc dag
+```
+dvc dag will show a graph of the pipeline and how the step are connected
+
+<br><br>
+
 
 
 # AWS-CICD-Deployment-with-Github-Actions

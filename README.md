@@ -4,7 +4,7 @@
 
 1. Update config.yaml
 2. Update params.yaml
-3. update the conponents
+3. update the components
 4. update the pipeline
 5. update the main.py
 6. update the app.py

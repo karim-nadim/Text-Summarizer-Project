@@ -1,157 +1,163 @@
-# End to end Text-Summarizer-Project
+# 📝 End-to-End Text Summarizer (NLP & MLOps Pipeline)
 
-## Workflows
+Welcome to the **End-to-End Text Summarizer** project! 
 
-1. Update config.yaml
-2. Update params.yaml
-3. update the components
-4. update the pipeline
-5. update the main.py
-6. update the app.py
+This repository contains a production-ready Machine Learning pipeline designed to automatically generate concise summaries of conversational dialogues. It leverages state-of-the-art Natural Language Processing (NLP) models and industry-standard MLOps practices for orchestration, containerization, and automated cloud deployment.
 
+---
 
-# How to run?
-### STEPS:
+## 🚀 Project Overview
 
-Clone the repository
+The goal of this project is to take conversational text (like chat logs or customer support transcripts) and condense them into meaningful summaries. 
 
+*   **Dataset:** [SAMSum Dataset](https://huggingface.co/datasets/samsum) (Messenger-like dialogues with human-annotated summaries).
+*   **Base Model:** Fine-tuned `DistilBART` (Sequence-to-Sequence LM) using Hugging Face Transformers.
+*   **Interface:** A RESTful API built with **FastAPI** to trigger training and serve predictions.
+*   **Deployment:** Automated via **GitHub Actions** to an **AWS EC2** instance using **Docker** and AWS ECR.
+
+---
+
+## 🛠️ Tech Stack & Tools
+
+*   **Machine Learning & NLP:** PyTorch, Hugging Face (`transformers`, `datasets`, `evaluate`)
+*   **Backend & API:** Python 3.11, FastAPI, Uvicorn
+*   **MLOps & Orchestration:** DVC (Data Version Control)
+*   **Containerization & Deployment:** Docker, AWS ECR, AWS EC2
+*   **CI/CD:** GitHub Actions (Automated Linting, Testing, and Deployment)
+
+---
+
+## 🧠 Machine Learning Pipeline Architecture
+
+The core of this project is a highly modular, 4-stage Machine Learning pipeline. Each stage is strictly decoupled, ensuring maintainability and reproducibility.
+
+1.  **Stage 1: Data Ingestion (`data_ingestion.py`)**
+    *   Automatically fetches the raw SAMSum dataset from the Hugging Face hub or a remote URL.
+    *   Saves the data locally as artifacts for the next stages.
+2.  **Stage 2: Data Transformation (`data_transformation.py`)**
+    *   Converts human-readable text into machine-readable numerical representations.
+    *   Utilizes the DistilBART Tokenizer to process dialogues and summaries into padded/truncated token arrays.
+3.  **Stage 3: Model Training (`model_trainer.py`)**
+    *   Fine-tunes the pre-trained `DistilBART` sequence-to-sequence model on the tokenized data.
+    *   Hyperparameters (Epochs, Batch Size, Weight Decay, etc.) are strictly controlled and easily adjustable via `params.yaml`.
+4.  **Stage 4: Model Evaluation (`model_evaluation.py`)**
+    *   Evaluates the newly trained model against unseen test data.
+    *   Calculates the **ROUGE** score (ROUGE-1, ROUGE-2, ROUGE-L, ROUGE-Lsum) to quantitatively measure the quality of the generated summaries against human references.
+
+---
+
+## ⚙️ Orchestration with DVC (Data Version Control)
+
+Running an entire ML pipeline every time a small change is made is computationally expensive. This project utilizes **DVC** to solve this:
+
+- **Pipeline Tracking:** `dvc.yaml` defines the inputs, dependencies, and outputs of every stage.
+- **Smart Execution:** If you run `dvc repro`, DVC automatically detects which stages have changed (e.g., changing a hyperparameter). It will *only* re-run the Model Training and Evaluation stages, entirely skipping Data Ingestion and Transformation to save time and compute resources.
+- **DAG Visualization:** Run `dvc dag` in the terminal to visually inspect the pipeline's dependency graph.
+
+---
+
+## 💻 How to Run Locally
+
+Follow these steps to set up the project on your local machine.
+
+### Step 1: Clone the Repository
 ```bash
-https://github.com/karim-nadim/Text-Summarizer-Project.git
+git clone https://github.com/karim-nadim/Text-Summarizer-Project.git
+cd Text-Summarizer-Project
 ```
-### STEP 01- Create a conda environment after opening the repository
 
+### Step 2: Create a Virtual Environment
+It is highly recommended to use Conda for dependency management.
 ```bash
 conda create -n summary python=3.11 -y
-```
-
-```bash
 conda activate summary
 ```
 
-
-### STEP 02- install the requirements
+### Step 3: Install Requirements
 ```bash
 pip install -r requirements.txt
 ```
 
-
+### Step 4: Run the Application
 ```bash
-# Finally run the following command
 python app.py
 ```
+*The FastAPI server will start. Open your browser and navigate to `http://localhost:8080/docs` to interact with the Swagger UI.*
 
-Now,
-```bash
-open up you local host and port
+---
+
+## 🌐 API Endpoints & Usage
+
+Once the application is running, you can access the following REST endpoints:
+
+*   `GET /`: Redirects to the FastAPI interactive documentation (Swagger UI).
+*   `GET /train`: Triggers the end-to-end `main.py` pipeline. This will execute Data Ingestion, Transformation, Training, and Evaluation sequentially.
+*   `POST /predict`: Accepts a text payload, passes it through the fine-tuned DistilBART model, and returns a summarized string.
+
+---
+
+## ☁️ CI/CD & AWS Cloud Deployment
+
+This project features a fully automated Continuous Integration and Continuous Deployment (CI/CD) pipeline built with **GitHub Actions**. Every push to the `main` branch triggers the following workflow:
+
+### 1. Continuous Integration (CI)
+*   **Setup:** Provisions an Ubuntu runner and sets up Python 3.11.
+*   **Linting:** Runs `flake8` to ensure code quality and adherence to PEP-8 standards.
+*   **Testing:** Runs `pytest` to execute unit tests and ensure code reliability.
+
+### 2. Continuous Delivery (CD)
+*   **AWS Authentication:** Securely authenticates with AWS using GitHub Secrets.
+*   **Dockerization:** Builds a Docker Image of the application.
+*   **ECR Push:** Tags and pushes the Docker container to an **Amazon ECR** (Elastic Container Registry) repository.
+
+### 3. Continuous Deployment (CD)
+*   **Self-Hosted Runner:** An **Amazon EC2** (Ubuntu) instance listens for successful builds.
+*   **Pull & Run:** The EC2 instance automatically pulls the latest Docker image from ECR, stops the old container, and starts the new one, exposing the API to the web on port `8080`.
+
+### Setting up AWS for this project:
+If you are forking this repo and want to replicate the AWS deployment, ensure you have:
+1.  Created an IAM User with `AmazonEC2FullAccess` and `AmazonEC2ContainerRegistryFullAccess`.
+2.  Created an ECR Repository named `textsummarization`.
+3.  Launched an EC2 Ubuntu Instance, installed Docker, and configured it as a GitHub Self-Hosted Runner.
+4.  Added the following GitHub Repository Secrets:
+    *   `AWS_ACCESS_KEY_ID`
+    *   `AWS_SECRET_ACCESS_KEY`
+    *   `AWS_REGION`
+    *   `AWS_ECR_LOGIN_URI`
+    *   `ECR_REPOSITORY_NAME`
+
+---
+
+## 📂 Project Structure
+
+```text
+Text-Summarizer-Project/
+│
+├── .github/workflows/main.yaml   # CI/CD Pipeline configuration
+├── src/textSummarizer/
+│   ├── components/               # Core ML Pipeline steps
+│   │   ├── data_ingestion.py
+│   │   ├── data_transformation.py
+│   │   ├── model_trainer.py
+│   │   └── model_evaluation.py
+│   ├── pipeline/                 # Pipeline execution scripts
+│   ├── utils/                    # Helper functions (e.g., read_yaml)
+│   └── logging/                  # Custom logging configuration
+│
+├── config/config.yaml            # File paths and artifact directories
+├── params.yaml                   # Hyperparameters for model training
+├── dvc.yaml                      # DVC orchestration graph
+├── app.py                        # FastAPI web server and endpoints
+├── main.py                       # Pipeline execution entry point
+├── Dockerfile                    # Containerization instructions
+└── requirements.txt              # Python dependencies
 ```
 
+---
 
-```bash
-Author: Karim Nadim
-Data Scientist
-Email: karim_ossama94@hotmail.com
+## 👨‍💻 Author
 
-```
-
-<br><br>
-
-## DVC 
-
- - It is used to manage the pipeline (what if we want to run the pipeline from the model_training step, and skip all the steps that were before) 
- - Its very lite weight for POC only
- - lite weight expriements tracker
- - It can perform Orchestration (Creating Pipelines)
- - Inside dvc.yaml we define each stage (e.g. data_ingestion), its python files, its dependancies, and its outputs.
-<br><br>
-
- 
-After completing all pipleline files, initialize DVC by running:
-```bash
-dvc init
-```
-Then run the full pipeline (ensure there is no artifacts folder). This work similar to main.py. Run:
-```bash
-dvc repro
-```
-A dvc.lock will be created automatically saving all info about the pipeline and tracking the last changes. If "dvc repro" is run again, only the pipeline stages with any new changes will run.
-```bash
-dvc dag
-```
-dvc dag will show a graph of the pipeline and how the step are connected
-
-<br><br>
-
-
-
-# AWS-CICD-Deployment-with-Github-Actions
-
-## 1. Login to AWS console.
-
-## 2. Create IAM user for deployment
-
-	#with specific access
-
-	1. EC2 access : It is virtual machine
-
-	2. ECR: Elastic Container registry to save your docker image in aws
-
-
-	#Description: About the deployment
-
-	1. Build docker image of the source code
-
-	2. Push your docker image to ECR
-
-	3. Launch Your EC2 
-
-	4. Pull Your image from ECR in EC2
-
-	5. Lauch your docker image in EC2
-
-	#Policy:
-
-	1. AmazonEC2ContainerRegistryFullAccess
-
-	2. AmazonEC2FullAccess
-
-	
-## 3. Create ECR repo to store/save docker image
-    - Save the URI: ......../textsummarization
-
-	
-## 4. Create EC2 machine (Ubuntu) 
-
-## 5. Open EC2 and Install docker in EC2 Machine:
-	
-	
-	#optinal
-
-	sudo apt-get update -y
-
-	sudo apt-get upgrade
-	
-	#required
-
-	curl -fsSL https://get.docker.com -o get-docker.sh
-
-	sudo sh get-docker.sh
-
-	sudo usermod -aG docker ubuntu
-
-	newgrp docker
-	
-# 6. Configure EC2 as self-hosted runner:
-    setting>actions>runner>new self hosted runner> choose os> then run command one by one
-
-
-# 7. Setup github secrets:
-
-    AWS_ACCESS_KEY_ID=
-
-    AWS_SECRET_ACCESS_KEY=
-
-    AWS_REGION = ca-central-1
-
-    AWS_ECR_LOGIN_URI = demo>>  
-
-    ECR_REPOSITORY_NAME = textsummarization
+**Karim Nadim**  
+Data Scientist & Machine Learning Engineer  
+📧 Email: karim_ossama94@hotmail.com  
+🔗 GitHub: karim-nadim
